@@ -1,0 +1,12 @@
+[package]
+name = "possu-api"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = { version = "0.5.0-rc.3", features = ["json", "secrets"] }
+serde = { version = "1.0.151", features = ["derive"] }
+chrono = { version = "0.4.23", features = ["clock", "serde"] }
+dotenvy = "0.15.6"
+log = "0.4"
+fern = "0.6"

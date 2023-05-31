@@ -3,11 +3,14 @@ use rocket::{
     http::Status,
     serde::json::Json,
 };
+use rocket_db_pools::Connection;
 
 use crate::{
     database::{
         self,
-        Expense,
+        setup::PossuDatabase,
+        DatabaseError,
+        Entry,
     },
     response::Response,
 };
@@ -19,23 +22,38 @@ pub(crate) fn get_healthcheck() -> (Status, Json<Response<(), ()>>) {
     (Status::Ok, Json(response))
 }
 
-#[get("/expense")]
-pub(crate) fn get_expense_list(
-) -> (Status, Json<Response<Vec<Expense>, ()>>) {
-    let result = database::get_expense_list();
+#[get("/entry")]
+pub(crate) async fn get_entry_list(
+    mut connection: Connection<PossuDatabase>,
+) -> (Status, Json<Response<Vec<Entry>, DatabaseError>>) {
+    let result = database::get_entry_list(&mut **connection).await;
+
+    let status = match result {
+        Ok(_) => Status::Ok,
+        Err(_) => Status::InternalServerError,
+    };
 
     let response = Response::from_result(result);
 
-    (Status::Ok, Json(response))
+    (status, Json(response))
 }
 
-#[get("/expense/<id>")]
-pub(crate) fn get_expense(
-    id: &str,
-) -> (Status, Json<Response<Expense, ()>>) {
-    let result = database::get_expense(id);
+#[get("/entry/<id>")]
+pub(crate) async fn get_entry(
+    id: i64,
+    mut connection: Connection<PossuDatabase>,
+) -> (Status, Json<Response<Entry, DatabaseError>>) {
+    let result = database::get_entry(id, &mut **connection).await;
+
+    let status = match result {
+        Ok(_) => Status::Ok,
+        Err(DatabaseError::NotFound) => Status::NotFound,
+        Err(DatabaseError::InternalServerError) => {
+            Status::InternalServerError
+        },
+    };
 
     let response = Response::from_result(result);
 
-    (Status::Ok, Json(response))
+    (status, Json(response))
 }

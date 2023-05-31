@@ -1,26 +1,43 @@
+mod functions;
+pub(crate) mod setup;
+
 use chrono::{
     DateTime,
     Utc,
 };
+pub(crate) use functions::{
+    get_entry,
+    get_entry_list,
+};
 use serde::Serialize;
 
-#[derive(Serialize)]
-pub(crate) struct Expense {
+#[derive(Debug, PartialEq, Serialize, sqlx::FromRow)]
+pub(crate) struct Entry {
+    id: i64,
     timestamp: DateTime<Utc>,
     category: String,
     description: String,
-    value: u64,
+    value: i64,
 }
 
-pub(crate) fn get_expense_list() -> Result<Vec<Expense>, ()> {
-    Ok(vec![])
+#[derive(Debug, PartialEq, Clone, Serialize)]
+pub(crate) enum DatabaseError {
+    NotFound,
+    InternalServerError,
 }
 
-pub(crate) fn get_expense(_id: &str) -> Result<Expense, ()> {
-    Ok(Expense {
-        timestamp: Utc::now(),
-        category: "Montly bill".to_string(),
-        description: "Mortgage".to_string(),
-        value: 80000,
-    })
+impl std::fmt::Display for DatabaseError {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
+        match self {
+            Self::NotFound => write!(f, "Resource not found"),
+            Self::InternalServerError => {
+                write!(f, "Internal Server Error")
+            },
+        }
+    }
 }
+
+impl std::error::Error for DatabaseError {}

@@ -10,3 +10,12 @@ chrono = { version = "0.4.23", features = ["clock", "serde"] }
 dotenvy = "0.15.6"
 log = "0.4"
 fern = "0.6"
+
+[dependencies.sqlx]
+version = "0.6"
+default-features = false
+features = ["runtime-tokio-rustls", "sqlite", "macros", "migrate", "chrono", "offline"]
+
+[dependencies.rocket_db_pools]
+version = "=0.1.0-rc.3"
+features = ["sqlx_sqlite"]

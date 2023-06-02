@@ -3,6 +3,7 @@ use chrono::{
     Utc,
 };
 use rocket::{
+    catch,
     get,
     http::Status,
     post,
@@ -26,8 +27,17 @@ use crate::{
     },
 };
 
+#[catch(default)]
+pub(crate) async fn default_catcher(
+    status: Status,
+    _: &rocket::Request<'_>,
+) -> (Status, Json<Response<(), String>>) {
+    (status, Json(Response::from_result(Err(status.to_string()))))
+}
+
 #[get("/healthcheck")]
-pub(crate) fn get_healthcheck() -> (Status, Json<Response<(), ()>>) {
+pub(crate) async fn get_healthcheck(
+) -> (Status, Json<Response<(), ()>>) {
     let response = Response::from_result(Ok(()));
 
     (Status::Ok, Json(response))

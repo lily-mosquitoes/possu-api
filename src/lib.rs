@@ -3,6 +3,7 @@ mod database;
 mod response;
 
 use rocket::{
+    catchers,
     routes,
     Build,
     Rocket,
@@ -12,6 +13,8 @@ use rocket_db_pools::Database;
 use crate::database::setup::PossuDatabase;
 
 pub fn rocket(database_url: &str) -> Rocket<Build> {
+    let catchers = catchers![crate::api::default_catcher];
+
     let routes = routes![
         crate::api::get_healthcheck,
         crate::api::get_entry_list,
@@ -33,5 +36,6 @@ pub fn rocket(database_url: &str) -> Rocket<Build> {
     rocket::custom(figment)
         .attach(PossuDatabase::init())
         .attach(PossuDatabase::migrate())
+        .register("/", catchers)
         .mount("/api", routes)
 }

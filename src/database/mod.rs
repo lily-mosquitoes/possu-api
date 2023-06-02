@@ -8,36 +8,40 @@ use chrono::{
 pub(crate) use functions::{
     get_entry,
     get_entry_list,
+    insert_entry_list,
 };
-use serde::Serialize;
+use rocket::http::Status;
+use serde::{
+    Deserialize,
+    Serialize,
+};
 
-#[derive(Debug, PartialEq, Serialize, sqlx::FromRow)]
+use crate::response::IntoStatus;
+
+#[derive(
+    Debug, Clone, PartialEq, Serialize, Deserialize, sqlx::FromRow,
+)]
 pub(crate) struct Entry {
-    id: i64,
-    timestamp: DateTime<Utc>,
-    category: String,
-    description: String,
-    value: i64,
+    #[serde(skip_deserializing)]
+    pub(crate) id: i64,
+    pub(crate) timestamp: DateTime<Utc>,
+    pub(crate) category: String,
+    pub(crate) description: String,
+    pub(crate) value: i64,
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
-pub(crate) enum DatabaseError {
-    NotFound,
-    InternalServerError,
-}
-
-impl std::fmt::Display for DatabaseError {
-    fn fmt(
-        &self,
-        f: &mut std::fmt::Formatter<'_>,
-    ) -> std::fmt::Result {
+impl IntoStatus for sqlx::Error {
+    fn into_status(self) -> (Status, String) {
         match self {
-            Self::NotFound => write!(f, "Resource not found"),
-            Self::InternalServerError => {
-                write!(f, "Internal Server Error")
-            },
+            sqlx::Error::RowNotFound => (
+                Status::NotFound,
+                "Database record not found".to_string(),
+            ),
+            _ => (
+                Status::InternalServerError,
+                "Internal Error: Connection with database failed"
+                    .to_string(),
+            ),
         }
     }
 }
-
-impl std::error::Error for DatabaseError {}

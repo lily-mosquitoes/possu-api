@@ -4,12 +4,12 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 INSERT OR IGNORE INTO categories (
-  id, name
+  name
 ) VALUES
-  (0, "Emilia's Income"),
-  (1, "Lílian's Income"),
-  (2, "Yearly Bills"),
-  (3, "Monthly Bills"),
-  (4, "One-time Purchases"),
-  (5, "Living Expenses"),
-  (6, "Repeat Purchases");
+  ("Emilia's Income"),
+  ("Lílian's Income"),
+  ("Yearly Bills"),
+  ("Monthly Bills"),
+  ("One-time Purchases"),
+  ("Living Expenses"),
+  ("Repeat Purchases");

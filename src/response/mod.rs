@@ -2,6 +2,13 @@ use chrono::{
     DateTime,
     Utc,
 };
+use rocket::{
+    http::Status,
+    serde::json::{
+        self,
+        serde_json,
+    },
+};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -24,6 +31,35 @@ impl<T, E> Response<T, E> {
             timestamp: Utc::now(),
             data,
             error,
+        }
+    }
+}
+
+pub(crate) trait IntoStatus {
+    fn into_status(self) -> (Status, String);
+}
+
+impl IntoStatus for json::Error<'_> {
+    fn into_status(self) -> (Status, String) {
+        match self {
+            json::Error::Io(e)
+                if e.kind() == std::io::ErrorKind::UnexpectedEof =>
+            {
+                (
+                    Status::PayloadTooLarge,
+                    json::Error::Io(e).to_string(),
+                )
+            },
+            json::Error::Parse(s, e)
+                if e.classify()
+                    == serde_json::error::Category::Data =>
+            {
+                (
+                    Status::UnprocessableEntity,
+                    json::Error::Parse(s, e).to_string(),
+                )
+            },
+            e => (Status::BadRequest, e.to_string()),
         }
     }
 }

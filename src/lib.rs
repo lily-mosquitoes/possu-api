@@ -16,6 +16,7 @@ pub fn rocket(database_url: &str) -> Rocket<Build> {
         crate::api::get_healthcheck,
         crate::api::get_entry_list,
         crate::api::get_entry,
+        crate::api::post_entry,
     ];
 
     let figment = rocket::Config::figment().merge((

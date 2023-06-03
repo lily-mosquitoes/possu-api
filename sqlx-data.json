@@ -1,0 +1,337 @@
+{
+  "db": "SQLite",
+  "07e6a92903e3c1db7005eec44ff448681efbb1baa2b4af5b32d0e45b429378ee": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT * FROM entries WHERE id = ?"
+  },
+  "36d3b537657058d019306ef504dd9804d4ff3d318794de0c7d0501028af1a0d0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp: DateTime<Utc>",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT\n            entries.id,\n            timestamp as \"timestamp: DateTime<Utc>\",\n            categories.name AS category,\n            description,\n            value\n        FROM entries\n        INNER JOIN categories ON categories.id = entries.category_id\n        WHERE entries.id = ?"
+  },
+  "42113eeb90a66bb5716528cee32793b3fad06ea5a106637fdda7ba0bb553d533": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "INSERT INTO entries (\n          timestamp,\n          category_id,\n          description,\n          value\n        ) SELECT ?, categories.id, ?, ?\n        FROM categories WHERE categories.name = ?\n        RETURNING id"
+  },
+  "5b483324beda0ee338ed2a6d5d80642e9a41c7f377f1094214379bda9187ca4a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp: DateTime<Utc>",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT\n            entries.id,\n            timestamp AS \"timestamp: DateTime<Utc>\",\n            categories.name AS category,\n            description,\n            value\n        FROM entries\n        INNER JOIN categories ON categories.id = entries.category_id"
+  },
+  "a61ab43a15564df268a45db960b4671467b31b16c4bc2ba9acd64ce5bd8ab52a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "SELECT entries.id FROM entries\n                INNER JOIN categories ON categories.id = entries.category_id\n                WHERE timestamp = ?\n                AND categories.name = ?\n                AND description = ?\n                AND value = ?\n                "
+  },
+  "a92781710d45456ea1afe774b9422e7a918f131707d44e53cb9115957289f8d8": {
+    "describe": {
+      "columns": [
+        {
+          "name": "timestamp: DateTime<Utc>",
+          "ordinal": 0,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 3,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT\n            timestamp AS \"timestamp: DateTime<Utc>\",\n            categories.name AS category,\n            description,\n            value\n        FROM entries\n        INNER JOIN categories ON categories.id = entries.category_id"
+  },
+  "cc86eb94225ce66c87d772640169840eb752812b3df3157242622c002401a649": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp: DateTime<Utc>",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "SELECT\n                entries.id,\n                timestamp as \"timestamp: DateTime<Utc>\",\n                categories.name AS category,\n                description,\n                value\n            FROM entries\n            INNER JOIN categories ON categories.id = entries.category_id\n            WHERE entries.id = ?"
+  },
+  "cf9c2d6e78e0eb9ca5f93a38caf1440d297d964c6fa285acb9728d75ebaca524": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category_id",
+          "ordinal": 2,
+          "type_info": "Int64"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT * FROM entries"
+  },
+  "e139448c9f98f07e1be46b75d52170422d4d9f21aa9fbd79a42cbe3d0fc65d38": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "timestamp: DateTime<Utc>",
+          "ordinal": 1,
+          "type_info": "Datetime"
+        },
+        {
+          "name": "category",
+          "ordinal": 2,
+          "type_info": "Text"
+        },
+        {
+          "name": "description",
+          "ordinal": 3,
+          "type_info": "Text"
+        },
+        {
+          "name": "value",
+          "ordinal": 4,
+          "type_info": "Int64"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Right": 0
+      }
+    },
+    "query": "SELECT\n                entries.id,\n                timestamp as \"timestamp: DateTime<Utc>\",\n                categories.name AS category,\n                description,\n                value\n            FROM entries\n            INNER JOIN categories ON categories.id = entries.category_id"
+  },
+  "ef2b15d9502dd6f69522e2f442edb2058ddef6c950ffa0270977df88a0578282": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "DELETE FROM entries WHERE id = ?"
+  }
+}

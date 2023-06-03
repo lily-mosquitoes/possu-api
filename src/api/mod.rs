@@ -4,6 +4,7 @@ use chrono::{
 };
 use rocket::{
     catch,
+    delete,
     get,
     http::Status,
     post,
@@ -128,6 +129,26 @@ pub(crate) async fn post_entry(
         },
         Err(json_error) => {
             let (status, error) = json_error.into_status();
+            (status, Err(error))
+        },
+    };
+
+    let response = Response::from_result(result);
+
+    (status, Json(response))
+}
+
+#[delete("/entry/<id>")]
+pub(crate) async fn delete_entry(
+    id: i64,
+    mut connection: Connection<PossuDatabase>,
+) -> (Status, Json<Response<(), String>>) {
+    let result = database::delete_entry(id, &mut **connection).await;
+
+    let (status, result) = match result {
+        Ok(()) => (Status::Ok, Ok(())),
+        Err(sqlx_error) => {
+            let (status, error) = sqlx_error.into_status();
             (status, Err(error))
         },
     };

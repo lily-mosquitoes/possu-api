@@ -120,6 +120,27 @@ pub(crate) async fn insert_entry_list(
     Ok(created_entries)
 }
 
+pub(crate) async fn delete_entry(
+    id: i64,
+    connection: &mut SqliteConnection,
+) -> Result<(), sqlx::Error> {
+    let result =
+        sqlx::query!(r#"DELETE FROM entries WHERE id = ?"#, id)
+            .execute(connection)
+            .await;
+
+    match result {
+        Ok(query) if query.rows_affected() == 0 => {
+            Err(sqlx::Error::RowNotFound)
+        },
+        Ok(_) => Ok(()),
+        Err(error) => {
+            log::error!("{}", error);
+            Err(error)
+        },
+    }
+}
+
 #[cfg(test)]
 mod test {
     use chrono::{
@@ -129,6 +150,7 @@ mod test {
     use rocket_db_pools::sqlx::SqlitePool;
 
     use super::{
+        delete_entry,
         get_entry,
         get_entry_list,
         insert_entry_list,
@@ -406,5 +428,76 @@ mod test {
         .await
         .expect("query to return");
         assert_eq!(database_entries.len(), 0);
+    }
+
+    #[sqlx::test(fixtures("entries"))]
+    fn delete_entry_returns_empty_when_id_exists(pool: SqlitePool) {
+        let mut connection = pool
+            .acquire()
+            .await
+            .expect("database connection to be acquired")
+            .detach();
+        let result: Result<(), sqlx::Error> =
+            delete_entry(EXISTING_ENTRY_ID, &mut connection).await;
+        assert!(result.is_ok());
+    }
+
+    #[sqlx::test(fixtures("entries"))]
+    fn delete_entry_returns_not_found_error_when_id_not_exists(
+        pool: SqlitePool,
+    ) {
+        let mut connection = pool
+            .acquire()
+            .await
+            .expect("database connection to be acquired")
+            .detach();
+        let result: Result<(), sqlx::Error> =
+            delete_entry(NON_EXISTING_ENTRY_ID, &mut connection)
+                .await;
+        assert_eq!(
+            result.map_err(|e| e.to_string()),
+            Err(sqlx::Error::RowNotFound.to_string())
+        );
+    }
+
+    #[sqlx::test(fixtures("drop_entries"))]
+    fn delete_entry_returns_other_error_on_server_failure(
+        pool: SqlitePool,
+    ) {
+        let mut connection = pool
+            .acquire()
+            .await
+            .expect("database connection to be acquired")
+            .detach();
+        let result: Result<(), sqlx::Error> =
+            delete_entry(EXISTING_ENTRY_ID, &mut connection).await;
+        let result = match result {
+            Ok(_) | Err(sqlx::Error::RowNotFound) => {
+                "ok or not found error"
+            },
+            Err(_) => "other database error",
+        };
+        assert_eq!(result, "other database error");
+    }
+
+    #[sqlx::test(fixtures("entries"))]
+    fn delete_entry_deletes_when_id_exists(pool: SqlitePool) {
+        let mut connection = pool
+            .acquire()
+            .await
+            .expect("database connection to be acquired")
+            .detach();
+        let _result: Result<(), sqlx::Error> =
+            delete_entry(EXISTING_ENTRY_ID, &mut connection).await;
+        let database_result = sqlx::query!(
+            r#"SELECT * FROM entries WHERE id = ?"#,
+            EXISTING_ENTRY_ID
+        )
+        .fetch_one(&mut connection)
+        .await;
+        assert_eq!(
+            database_result.map(|v| v.id).map_err(|e| e.to_string()),
+            Err(sqlx::Error::RowNotFound.to_string())
+        );
     }
 }

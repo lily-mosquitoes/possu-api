@@ -6,6 +6,7 @@ use chrono::{
     Utc,
 };
 pub(crate) use functions::{
+    delete_entry,
     get_entry,
     get_entry_list,
     insert_entry_list,

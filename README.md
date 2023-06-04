@@ -1,4 +1,9 @@
+
 # Possu (backend)
+
+![License](https://img.shields.io/github/license/lily-mosquitoes/possu-api?color=ff69b4&style=for-the-badge)
+![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/lily-mosquitoes/possu-api?include_prereleases&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/lily-mosquitoes/possu-api/test.yaml?label=tests&style=for-the-badge)
 
 This API allows for registering expenses
 while categorizing them, for personal organization.

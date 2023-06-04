@@ -1,0 +1,632 @@
+_type: export
+__export_format: 4
+__export_date: 2023-06-04T21:03:28.260Z
+__export_source: insomnia.desktop.app:v2022.6.0
+resources:
+  - _id: req_wrk_4e143b3890c84082b6b8fd95bbd3390ec6e3aaf6
+    parentId: fld_wrk_4e143b3890c84082b6b8fd95bbd3390ec6e3aaf6
+    modified: 1685912287785
+    created: 1685903042759
+    url: "{{ base_url }}/healthcheck"
+    name: endpoint for CI/CD
+    description: |-
+      # Behaviour:
+      Always returns ok.
+      Used for checking that the service is up.
+
+      # Return values:
+      Returns a field `timestamp` with the datetime of
+      the response and a field `data` which is null.
+
+      # Statuses:
+      Will always return `200 Ok`.
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1685903042759
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_wrk_4e143b3890c84082b6b8fd95bbd3390ec6e3aaf6
+    parentId: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    modified: 1685910897035
+    created: 1685910897035
+    name: healthcheck
+    description: Healthcheck endpoint
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1685910897035
+    _type: request_group
+  - _id: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    parentId: null
+    modified: 1685818743254
+    created: 1685818743254
+    name: possu-api.yaml
+    description: ""
+    scope: design
+    _type: workspace
+  - _id: req_wrk_4e143b3890c84082b6b8fd95bbd3390e73ec6e23
+    parentId: fld_wrk_4e143b3890c84082b6b8fd95bbd3390e61c4128c
+    modified: 1685912318402
+    created: 1685903042758
+    url: "{{ base_url }}/entry"
+    name: get all entries
+    description: >-
+      # Behaviour:
+
+      Returns all entries in the database.
+
+
+      # Return values:
+
+      Returns a field `timestamp` with the datetime of
+
+      the response and a field `data` which contains
+
+      a list of entries or a field `error` on failure.
+
+      If no entries exist the list in `data` will be empty.
+
+
+      # Statuses:
+
+      On normal operation should return `200 Ok`, even when no records are present.
+
+      Will return `500 Internal Server Error` if connection with the database
+
+      fails or the database is compromised.
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1685903042758
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: fld_wrk_4e143b3890c84082b6b8fd95bbd3390e61c4128c
+    parentId: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    modified: 1685903042761
+    created: 1685903042761
+    name: entry
+    description: An expense or income
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1685903042761
+    _type: request_group
+  - _id: req_wrk_4e143b3890c84082b6b8fd95bbd3390e53d0e7bd
+    parentId: fld_wrk_4e143b3890c84082b6b8fd95bbd3390e61c4128c
+    modified: 1685912420091
+    created: 1685903042756
+    url: "{{ base_url }}/entry"
+    name: create one or more entries
+    description: >-
+      # Requirements:
+
+      The request must be of content-type JSON and
+
+      the body must be of the form:
+
+      ```json
+
+      {
+      	"timestamp": "2023-06-03T19:05:00.000Z",
+      	"category": "Monthly Bills",
+      	"description": "test",
+      	"value": 2800,
+      	"repeat": [
+      		"2023-07-03T19:05:00.000Z",
+      		"2023-08-03T19:05:00.000Z",
+      		"2023-09-03T19:05:00.000Z"
+      	]
+      }
+
+      ```
+
+
+      Where `timestamp` is a valid ISO timestapm string,
+
+      `category` is a valid category in the database,
+
+      `description` is an arbitrary string,
+
+      `value` is an arbitrary signed 64-bit integer value
+
+      (which will be interpreted as a monetary value by using the last two digits as cents),
+
+      and `repeat` is an OPTIONAL key, which if present must be
+
+      an array of valid ISO timestamp strings.
+
+
+      # Behaviour:
+
+      Creates one or more entries with the given values in the JSON body of the request.
+
+      If the key `repeat` is not present, only one entry is created, if the key `repeat`
+
+      is present additional entries are created for each given timestamp with the other
+
+      values being the same as in the first entry.
+
+      If one of the entries to be created fails to be created, the whole operation will
+
+      fail and the database will remain unchanged.
+
+
+      # Return values:
+
+      Returns a field `timestamp` with the datetime of
+
+      the response and a field `data` with a list of
+
+      created entries (one or more) or a field `error`
+
+      on failure.
+
+      If the `category` given does not exist the field `error`
+
+      will return not found.
+
+
+      # Statuses:
+
+      On normal operation should return `201 Created` if all entries
+
+      were sucessfully created or `404 Not Found` if the given `category`
+
+      does not exist.
+
+      Will return `404 Not Found` if the content-type is not JSON.
+
+      Will return `400 Bad Request` if the given JSON is invalid.
+
+      Will return `422 Unprocessable Entity` if it fails to contain the expected
+
+      format for the JSON body.
+
+      Will return `500 Internal Server Error` if connection with the database
+
+      fails or the database is compromised.
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "timestamp": "2023-06-04T18:24:02.752Z",
+          "category": "Emilia's Income",
+          "description": "string",
+          "value": 0,
+          "repeat": [
+            "2023-06-04T18:24:02.752Z"
+          ]
+        }
+    parameters: []
+    headers:
+      - name: Content-Type
+        value: application/json
+        id: pair_78d2eb0892bb479e8922c1799aec118f
+    authentication: {}
+    metaSortKey: -1685903042756
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_wrk_4e143b3890c84082b6b8fd95bbd3390e1ce2ccb3
+    parentId: fld_wrk_4e143b3890c84082b6b8fd95bbd3390e61c4128c
+    modified: 1685912453964
+    created: 1685903042756
+    url: "{{ base_url }}/entry/{{ id }}"
+    name: get entry by ID
+    description: |-
+      # Requirements:
+      A valid entry ID must be provided in the URI.
+
+      # Behaviour:
+      Returns the entry with the given ID, if it exists.
+
+      # Return values:
+      Returns a field `timestamp` with the datetime of
+      the response and a field `data` which contains
+      the entry with the requested ID or a field `error`
+      on failure.
+      If no entry exists with that ID the field `error`
+      will show that information.
+
+      # Statuses:
+      On normal operation should return `200 Ok` if an entry
+      exists with the given ID or `404 Not Found` if it doesn't.
+      Will return `500 Internal Server Error` if connection with the database
+      fails or the database is compromised.
+    method: GET
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1685903042756
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: req_wrk_4e143b3890c84082b6b8fd95bbd3390e51fb29dc
+    parentId: fld_wrk_4e143b3890c84082b6b8fd95bbd3390e61c4128c
+    modified: 1685912501688
+    created: 1685903042754
+    url: "{{ base_url }}/entry/{{ id }}"
+    name: delete entry by ID
+    description: |-
+      # Requirements:
+      A valid entry ID must be provided in the URI.
+
+      # Behaviour:
+      Deletes the entry with the given ID, if it exists.
+
+      # Return values:
+      Returns a field `timestamp` with the datetime of
+      the response and a field `data` which is empty
+      or a field `error` on failure.
+      If no entry exists with that ID the field `error`
+      will show that information.
+
+      # Statuses:
+      On normal operation should return `200 Ok` if an entry
+      exists with the given ID or `404 Not Found` if it doesn't.
+      Will return `500 Internal Server Error` if connection with the database
+      fails or the database is compromised.
+    method: DELETE
+    body: {}
+    parameters: []
+    headers: []
+    authentication: {}
+    metaSortKey: -1685903042754
+    isPrivate: false
+    settingStoreCookies: true
+    settingSendCookies: true
+    settingDisableRenderRequestBody: false
+    settingEncodeUrl: true
+    settingRebuildPath: true
+    settingFollowRedirects: global
+    _type: request
+  - _id: env_369d4e56daeb781fa7310a6ce9e1782ad496ed29
+    parentId: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    modified: 1685911972044
+    created: 1685818743261
+    name: Base Environment
+    data:
+      base_url: "{{ scheme }}://{{ host }}{{ base_path }}"
+    dataPropertyOrder:
+      "&":
+        - base_url
+    color: null
+    isPrivate: false
+    metaSortKey: 1685818743261
+    _type: environment
+  - _id: jar_369d4e56daeb781fa7310a6ce9e1782ad496ed29
+    parentId: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    modified: 1685818743263
+    created: 1685818743263
+    name: Default Jar
+    cookies: []
+    _type: cookie_jar
+  - _id: spc_b9cc00a307254a19bd187ddcc1e7a6d2
+    parentId: wrk_4e143b3890c84082b6b8fd95bbd3390e
+    modified: 1685912532717
+    created: 1685818743255
+    fileName: possu-api
+    contents: >-
+      openapi: 3.0.0
+
+      info:
+        description: "This is self-hosted application for logging expenses. You can find out more on [github](https://github.com/lily-mosquitoes/possu-api)."
+        version: 0.1.0
+        title: Possu
+        contact:
+          email: lily.mosquitoes@gmail.com
+        license:
+          name: AGPL v3.0 or later
+          url: https://www.gnu.org/licenses/agpl-3.0.en.html
+      tags:
+        - name: healthcheck
+          description: Healthcheck endpoint
+        - name: entry
+          description: An expense or income
+        - name: category
+          description: A category of entry
+      paths:
+        /healthcheck:
+          get:
+            tags:
+              - healthcheck
+            summary: endpoint for CI/CD
+            operationId: healthcheck
+            responses:
+              "200":
+                description: "Healthcheck successfull"
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the response
+                        data:
+                          type: object
+                          nullable: true
+        /entry:
+          get:
+            tags:
+              - entry
+            summary: get all entries
+            operationId: getAllEntries
+            responses:
+              "200":
+                description: "List of existing entries returned (may be zero)"
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the response
+                        data:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Entry'
+                          minItems: 0
+              "500":
+                $ref: '#/components/responses/InternalServerError'
+          post:
+            tags:
+              - entry
+            summary: create one or more entries
+            operationId: createEntry
+            requestBody:
+              $ref: "#/components/requestBodies/Entry"
+            responses:
+              "200":
+                description: "List of created entries returned"
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the response
+                        data:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Entry'
+                          minItems: 1
+              "404":
+                $ref: '#/components/responses/CategoryNotFound'
+              "400":
+                $ref: '#/components/responses/BadRequest'
+              "422":
+                $ref: '#/components/responses/UnprocessableEntity'
+              "500":
+                $ref: '#/components/responses/InternalServerError'
+        /entry/{id}:
+          get:
+            tags:
+              - entry
+            summary: get entry by ID
+            operationId: getEntryById
+            parameters:
+              - name: id
+                in: path
+                description: ID of entry to return
+                required: true
+                schema:
+                  type: integer
+                  format: int64
+            responses:
+              "200":
+                description: "Entry returned"
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the response
+                        data:
+                          $ref: '#/components/schemas/Entry'
+              "404":
+                $ref: '#/components/responses/NotFound'
+              "500":
+                $ref: '#/components/responses/InternalServerError'
+          delete:
+            tags:
+              - entry
+            summary: delete entry by ID
+            operationId: deleteEntryById
+            parameters:
+              - name: id
+                in: path
+                description: ID of entry to return
+                required: true
+                schema:
+                  type: integer
+                  format: int64
+            responses:
+              "200":
+                description: "Entry deleted"
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The timestamp of the response
+                        data:
+                          type: object
+                          nullable: true
+              "404":
+                $ref: '#/components/responses/NotFound'
+              "500":
+                $ref: '#/components/responses/InternalServerError'
+      externalDocs:
+        description: Find out more about Possu
+        url: https://github.com/lily-mosquitoes/possu-api
+      servers:
+        - url: http://localhost:8000/api
+      components:
+        requestBodies:
+          Entry:
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/EntryForm"
+            description: Form for registering one or more entries
+            required: true
+        responses:
+          NotFound:
+            description: The resource was not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          CategoryNotFound:
+            description: The category was not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          BadRequest:
+            description: The request was malformed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          UnprocessableEntity:
+            description: The request was semantically incorrect
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          InternalServerError:
+            description: The server encountered an error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        schemas:
+          Category:
+            type: string
+            description: The category of entry
+            enum:
+              - "Emilia's Income"
+              - "Lílian's Income"
+              - Monthly Bills
+              - Yearly Bills
+              - One-time Purchases
+              - Living Expenses
+              - Repeat Purchases
+          EntryForm:
+            type: object
+            required:
+              - timestamp
+              - category
+              - description
+              - value
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                description: The timestamp to be recorded
+              category:
+                $ref: '#/components/schemas/Category'
+              description:
+                type: string
+                description: A description of the entry
+              value:
+                type: integer
+                format: int64
+                description: a signed 64-bit integer which will be read as a monetary value using the last two digits as cents
+              repeat:
+                type: array
+                items:
+                  type: string
+                  format: date-time
+                description: the datetime(s) of additional records to be created with the same category, description and value
+          Entry:
+            type: object
+            required:
+              - timestamp
+              - category
+              - description
+              - value
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                description: The timestamp to be recorded
+              category:
+                $ref: '#/components/schemas/Category'
+              description:
+                type: string
+                description: A description of the entry
+              value:
+                type: integer
+                format: int64
+                description: a signed 64-bit integer which represents a monetary value using the last two digits as cents
+          Error:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                description: The timestamp of the response
+              error:
+                type: string
+                description: The error message
+    contentType: yaml
+    _type: api_spec
+  - _id: env_env_369d4e56daeb781fa7310a6ce9e1782ad496ed29_sub
+    parentId: env_369d4e56daeb781fa7310a6ce9e1782ad496ed29
+    modified: 1685912011692
+    created: 1685818963454
+    name: Development
+    data:
+      scheme: http
+      base_path: /api
+      host: localhost:8000
+    dataPropertyOrder:
+      "&":
+        - scheme
+        - host
+        - base_path
+    color: null
+    isPrivate: false
+    metaSortKey: 1685818963454
+    _type: environment
